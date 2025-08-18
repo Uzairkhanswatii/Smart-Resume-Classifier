@@ -18,8 +18,10 @@ def load_model():
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
     model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
 
-    # Load label encoder from GitHub
-   import requests, io, pickle
+# Load label encoder from GitHub
+import requests
+import io
+import pickle
 
 url = "https://raw.githubusercontent.com/uzairkhanswatii/Smart-Resume-Classifier/main/label_encoder.pkl"
 response = requests.get(url)
