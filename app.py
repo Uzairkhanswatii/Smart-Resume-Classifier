@@ -10,19 +10,26 @@ from huggingface_hub import hf_hub_download
 st.set_page_config(page_title="Smart Resume Classifier", page_icon="📄")
 
 MODEL_NAME = "uzairkhanswatii/Smart-Resume-Classifier"  # HF Hub model repo
+LABEL_ENCODER_URL = "https://raw.githubusercontent.com/uzairkhanswatii/Smart-Resume-Classifier/main/label_encoder.pkl"
 
 @st.cache_resource
 def load_model():
+    # Load tokenizer and model from Hugging Face
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
     model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
-    # Download label_encoder.pkl from Hugging Face Hub
-    label_path = hf_hub_download(repo_id=MODEL_NAME, filename="label_encoder.pkl")
-    with open(label_path, "rb") as f:
-        label_encoder = pickle.load(f)
 
+    # Load label encoder from GitHub
+    import requests
+    import io
+    response = requests.get(LABEL_ENCODER_URL)
+    response.raise_for_status()  # ensure we catch HTTP errors
+    label_encoder = pickle.load(io.BytesIO(response.content))
+
+    # Move model to device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
     model.eval()
+    
     return tokenizer, model, label_encoder, device
 
 tokenizer, model, label_encoder, device = load_model()
