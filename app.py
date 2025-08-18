@@ -19,11 +19,13 @@ def load_model():
     model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
 
     # Load label encoder from GitHub
-    import requests
-    import io
-    response = requests.get(LABEL_ENCODER_URL)
-    response.raise_for_status()  # ensure we catch HTTP errors
-    label_encoder = pickle.load(io.BytesIO(response.content))
+   import requests, io, pickle
+
+url = "https://raw.githubusercontent.com/uzairkhanswatii/Smart-Resume-Classifier/main/label_encoder.pkl"
+response = requests.get(url)
+response.raise_for_status()
+label_encoder = pickle.loads(response.content) 
+
 
     # Move model to device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
