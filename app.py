@@ -23,7 +23,7 @@ def load_model():
     model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
 
     # Load label encoder from GitHub
-    LABEL_ENCODER_URL = "https://raw.githubusercontent.com/uzairkhanswatii/Smart-Resume-Classifier/main/label_encoder.pkl"
+    LABEL_ENCODER_URL = "https://raw.githubusercontent.com/uzairkhanswatii/Smart-Resume-Classifier/main/label_encoder1.pkl"
     response = requests.get(LABEL_ENCODER_URL)
     response.raise_for_status()
     label_encoder = pickle.loads(response.content)
