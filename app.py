@@ -29,10 +29,10 @@ response.raise_for_status()
 label_encoder = pickle.loads(response.content) 
 
 
-    # Move model to device
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model.to(device)
-    model.eval()
+# Move model to device
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model.to(device)
+model.eval()
     
     return tokenizer, model, label_encoder, device
 
