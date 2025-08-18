@@ -1,0 +1,6 @@
+streamlit
+torch
+transformers
+joblib
+pymupdf
+huggingface-hub
