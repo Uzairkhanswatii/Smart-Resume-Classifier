@@ -34,7 +34,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
 model.eval()
     
-    return tokenizer, model, label_encoder, device
+return tokenizer, model, label_encoder, device
 
 tokenizer, model, label_encoder, device = load_model()
 
