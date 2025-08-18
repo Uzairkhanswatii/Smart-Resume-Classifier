@@ -14,27 +14,25 @@ LABEL_ENCODER_URL = "https://raw.githubusercontent.com/uzairkhanswatii/Smart-Res
 
 @st.cache_resource
 def load_model():
+    import requests, io, pickle
+    from transformers import AutoTokenizer, AutoModelForSequenceClassification
+    import torch
+
     # Load tokenizer and model from Hugging Face
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
     model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
 
-# Load label encoder from GitHub
-import requests
-import io
-import pickle
+    # Load label encoder from GitHub
+    LABEL_ENCODER_URL = "https://raw.githubusercontent.com/yourusername/yourrepo/main/label_encoder.pkl"
+    response = requests.get(LABEL_ENCODER_URL)
+    response.raise_for_status()
+    label_encoder = pickle.load(io.BytesIO(response.content))
 
-url = "https://raw.githubusercontent.com/uzairkhanswatii/Smart-Resume-Classifier/main/label_encoder.pkl"
-response = requests.get(url)
-response.raise_for_status()
-label_encoder = pickle.loads(response.content) 
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model.to(device)
+    model.eval()
 
-
-# Move model to device
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model.to(device)
-model.eval()
-    
-return tokenizer, model, label_encoder, device
+    return tokenizer, model, label_encoder, device
 
 tokenizer, model, label_encoder, device = load_model()
 
