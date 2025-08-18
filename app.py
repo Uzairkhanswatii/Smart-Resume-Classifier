@@ -26,7 +26,7 @@ def load_model():
     LABEL_ENCODER_URL = "https://raw.githubusercontent.com/uzairkhanswatii/Smart-Resume-Classifier/main/label_encoder.pkl"
     response = requests.get(LABEL_ENCODER_URL)
     response.raise_for_status()
-    label_encoder = pickle.load(io.BytesIO(response.content))
+    label_encoder = pickle.loads(response.content)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
