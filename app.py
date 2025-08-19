@@ -13,8 +13,6 @@ st.set_page_config(page_title="Smart Resume Classifier", page_icon="📄")
 MODEL_NAME = "uzairkhanswatii/Smart-Resume-Classifier"  # HF Hub model repo
 LABEL_ENCODER_URL = "https://raw.githubusercontent.com/Uzairkhanswatii/Smart-Resume-Classifier/main/label_encoder2.pkl"
 
-
-@st.cache_resource
 def load_modelv2():
     # Load tokenizer and model from Hugging Face
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
