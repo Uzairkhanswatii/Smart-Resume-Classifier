@@ -6,6 +6,7 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import pickle
 from huggingface_hub import hf_hub_download
 import requests
+import io
 # ================== Load Model & Tokenizer ==================
 
 st.set_page_config(page_title="Smart Resume Classifier", page_icon="📄")
