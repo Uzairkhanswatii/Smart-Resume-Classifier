@@ -3,26 +3,35 @@ import torch
 import fitz  # PyMuPDF
 import torch.nn.functional as F
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
-import pickle
-from huggingface_hub import hf_hub_download
 import requests
 import io
-# ================== Load Model & Tokenizer ==================
+import json
+import re
 
+# ================== Load Model & Tokenizer ==================
 st.set_page_config(page_title="Smart Resume Classifier", page_icon="📄")
 
 MODEL_NAME = "uzairkhanswatii/Smart-Resume-Classifier"  # HF Hub model repo
-LABEL_ENCODER_URL = "https://raw.githubusercontent.com/Uzairkhanswatii/Smart-Resume-Classifier/main/label_encoder2.pkl"
+LABEL_ENCODER_URL = "https://raw.githubusercontent.com/Uzairkhanswatii/Smart-Resume-Classifier/main/label_encoder.json"
 
 def load_modelv2():
     # Load tokenizer and model from Hugging Face
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
     model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
 
-    # Load label encoder from GitHub
+    # Load label encoder from GitHub (JSON instead of pickle)
     response = requests.get(LABEL_ENCODER_URL)
     response.raise_for_status()
-    label_encoder = pickle.loads(response.content)
+    classes = json.loads(response.content.decode("utf-8"))
+
+    # Custom "encoder" wrapper to mimic LabelEncoder API
+    class SimpleLabelEncoder:
+        def __init__(self, classes):
+            self.classes_ = classes
+        def inverse_transform(self, indices):
+            return [self.classes_[i] for i in indices]
+
+    label_encoder = SimpleLabelEncoder(classes)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
@@ -34,6 +43,13 @@ def load_modelv2():
 # Call once and cache
 tokenizer, model, label_encoder, device = load_modelv2()
 
+# ================== Text Preprocessing ==================
+def preprocess_text(text):
+    text = text.lower()  # lowercase
+    text = re.sub(r"[^a-zA-Z\s]", " ", text)  # remove punctuation/numbers
+    text = re.sub(r"\s+", " ", text).strip()  # normalize whitespace
+    return text
+
 # ================== PDF Text Extraction ==================
 def extract_text_from_pdf(pdf_file):
     doc = fitz.open(stream=pdf_file.read(), filetype="pdf")
@@ -44,6 +60,8 @@ def extract_text_from_pdf(pdf_file):
 
 # ================== Prediction ==================
 def predict_resume(text):
+    text = preprocess_text(text)
+
     encoding = tokenizer(
         text, truncation=True, padding="max_length", max_length=512, return_tensors="pt"
     )
@@ -59,7 +77,7 @@ def predict_resume(text):
     confidence = probs[max_idx]
     return label, confidence
 
-# ================== Recommendation Engine (Optional) ==================
+# ================== Recommendation Engine ==================
 def recommend_job_roles(predicted_label):
     recommendations = {
         "Data Science": ["Data Analyst", "ML Engineer", "AI Researcher"],
@@ -71,21 +89,36 @@ def recommend_job_roles(predicted_label):
 
 # ================== Streamlit UI ==================
 st.title("📄 Smart Resume Classifier")
-st.caption("Upload one or more PDF resumes and get predicted categories with confidence scores.")
+st.caption("Upload a resume PDF or paste resume text to classify.")
 
-uploaded_files = st.file_uploader(
-    "Choose PDF files", type="pdf", accept_multiple_files=True
-)
+# Input options
+option = st.radio("Choose input method:", ["Upload PDF", "Enter Text"])
 
-if uploaded_files:
-    st.subheader("📌 Classified Resumes")
-    with st.container():
+texts_to_classify = []
+
+if option == "Upload PDF":
+    uploaded_files = st.file_uploader(
+        "Choose PDF files", type="pdf", accept_multiple_files=True
+    )
+    if uploaded_files:
         for uploaded_file in uploaded_files:
             text = extract_text_from_pdf(uploaded_file)
-            label, confidence = predict_resume(text)
-            st.markdown(f"**{uploaded_file.name}** → 🏷️ {label} (Confidence: {confidence:.2f})")
+            texts_to_classify.append((uploaded_file.name, text))
 
-            # Show recommendations (optional)
+elif option == "Enter Text":
+    user_text = st.text_area("Paste your resume text here:")
+    if user_text.strip():
+        texts_to_classify.append(("Manual Input", user_text))
+
+# Run classification if we have text
+if texts_to_classify:
+    st.subheader("📌 Classified Resumes")
+    with st.container():
+        for name, text in texts_to_classify:
+            label, confidence = predict_resume(text)
+            st.markdown(f"**{name}** → 🏷️ {label} (Confidence: {confidence:.2f})")
+
+            # Show recommendations
             recs = recommend_job_roles(label)
             st.write("🔮 Recommended Roles:", ", ".join(recs))
             st.divider()
