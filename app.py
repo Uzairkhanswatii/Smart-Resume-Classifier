@@ -5,31 +5,25 @@ import torch.nn.functional as F
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import pickle
 from huggingface_hub import hf_hub_download
-
+import requests
 # ================== Load Model & Tokenizer ==================
+
 st.set_page_config(page_title="Smart Resume Classifier", page_icon="📄")
 
 MODEL_NAME = "uzairkhanswatii/Smart-Resume-Classifier"  # HF Hub model repo
 LABEL_ENCODER_URL = "https://raw.githubusercontent.com/Uzairkhanswatii/Smart-Resume-Classifier/main/label_encoder2.pkl"
 
-@st.cache_resource
-def load_model():
-    import requests, io, pickle
-    from transformers import AutoTokenizer, AutoModelForSequenceClassification
-    import torch
 
+@st.cache_resource
+def load_modelv2():
     # Load tokenizer and model from Hugging Face
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
     model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
 
     # Load label encoder from GitHub
-def load_label_encoder():
-    LABEL_ENCODER_URL = "https://raw.githubusercontent.com/Uzairkhanswatii/Smart-Resume-Classifier/main/label_encoder2.pkl"
     response = requests.get(LABEL_ENCODER_URL)
     response.raise_for_status()
     label_encoder = pickle.loads(response.content)
-    return label_encoder
-label_encoder = load_label_encoder()
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
@@ -37,7 +31,9 @@ label_encoder = load_label_encoder()
 
     return tokenizer, model, label_encoder, device
 
-tokenizer, model, label_encoder, device = load_model()
+
+# Call once and cache
+tokenizer, model, label_encoder, device = load_modelv2()
 
 # ================== PDF Text Extraction ==================
 def extract_text_from_pdf(pdf_file):
