@@ -10,7 +10,7 @@ from huggingface_hub import hf_hub_download
 st.set_page_config(page_title="Smart Resume Classifier", page_icon="📄")
 
 MODEL_NAME = "uzairkhanswatii/Smart-Resume-Classifier"  # HF Hub model repo
-LABEL_ENCODER_URL = "https://raw.githubusercontent.com/uzairkhanswatii/Smart-Resume-Classifier/main/label_encoder2.pkl"
+#LABEL_ENCODER_URL = "https://raw.githubusercontent.com/uzairkhanswatii/Smart-Resume-Classifier/main/label_encoder2.pkl"
 
 @st.cache_resource
 def load_model():
