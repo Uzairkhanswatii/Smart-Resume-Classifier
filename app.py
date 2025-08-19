@@ -150,7 +150,8 @@ elif option == "Enter Text":
     col1, col2 = st.columns(2)
     with col1:
         if st.button("Clear Text"):
-            st.session_state["resume_input"] = ""
+            st.session_state.resume_input= ""
+            st.experimental_rerun()
     with col2:
         pass
     if user_text.strip():
