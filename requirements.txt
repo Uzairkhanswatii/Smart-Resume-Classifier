@@ -4,4 +4,5 @@ transformers
 joblib
 pymupdf
 huggingface-hub
-scikit-learn
+python==3.11.x
+scikit-learn==1.6.1
