@@ -80,12 +80,52 @@ def predict_resume(text):
 # ================== Recommendation Engine ==================
 def recommend_job_roles(predicted_label):
     recommendations = {
+        "Accountant": ["Financial Analyst", "Auditor", "Tax Consultant"],
+        "Advocate": ["Legal Advisor", "Corporate Lawyer", "Paralegal"],
+        "Agriculture": ["Farm Manager", "Agronomist", "Agricultural Scientist"],
+        "Apparel": ["Fashion Designer", "Merchandiser", "Textile Engineer"],
+        "Architecture": ["Interior Designer", "Urban Planner", "Landscape Architect"],
+        "Arts": ["Graphic Designer", "Animator", "Creative Director"],
+        "Automobile": ["Automotive Engineer", "Vehicle Designer", "Production Engineer"],
+        "Aviation": ["Pilot", "Aircraft Maintenance Engineer", "Aerospace Engineer"],
+        "BPO": ["Customer Support", "Call Center Executive", "Team Lead"],
+        "Banking": ["Credit Analyst", "Investment Banker", "Loan Officer"],
+        "Blockchain": ["Smart Contract Developer", "Crypto Analyst", "Blockchain Architect"],
+        "Building and Construction": ["Site Engineer", "Quantity Surveyor", "Project Engineer"],
+        "Business Analyst": ["Product Analyst", "Data Analyst", "Strategy Consultant"],
+        "Civil Engineer": ["Structural Engineer", "Construction Manager", "Geotechnical Engineer"],
+        "Consultant": ["Management Consultant", "IT Consultant", "Strategy Advisor"],
         "Data Science": ["Data Analyst", "ML Engineer", "AI Researcher"],
-        "Web Developer": ["Frontend Developer", "Backend Developer", "Fullstack Developer"],
-        "Software Engineer": ["DevOps Engineer", "System Engineer", "SRE"],
-        "Project Manager": ["Scrum Master", "Agile Coach", "Product Manager"],
+        "Database": ["Database Administrator", "SQL Developer", "Data Architect"],
+        "Designing": ["UI/UX Designer", "Graphic Designer", "Product Designer"],
+        "DevOps": ["Cloud Engineer", "CI/CD Engineer", "Site Reliability Engineer"],
+        "Digital Media": ["SEO Specialist", "Content Manager", "Social Media Strategist"],
+        "DotNet Developer": [".NET Core Developer", "Backend Engineer", "C# Developer"],
+        "ETL Developer": ["Data Engineer", "Informatica Developer", "BI Developer"],
+        "Education": ["Teacher", "Curriculum Developer", "Academic Coordinator"],
+        "Electrical Engineering": ["Power Engineer", "Electronics Engineer", "Control Systems Engineer"],
+        "Finance": ["Investment Analyst", "Portfolio Manager", "Financial Controller"],
+        "Food and Beverages": ["Food Technologist", "Quality Assurance Specialist", "Production Manager"],
+        "Health and Fitness": ["Dietician", "Personal Trainer", "Health Coach"],
+        "Human Resources": ["Talent Acquisition Specialist", "HR Generalist", "Compensation Analyst"],
+        "Information Technology": ["System Administrator", "IT Support Specialist", "Solutions Architect"],
+        "Java Developer": ["Spring Boot Developer", "Backend Engineer", "J2EE Developer"],
+        "Management": ["Operations Manager", "Business Manager", "Program Manager"],
+        "Mechanical Engineer": ["Design Engineer", "Manufacturing Engineer", "HVAC Engineer"],
+        "Network Security Engineer": ["Cybersecurity Analyst", "SOC Analyst", "Security Consultant"],
+        "Operations Manager": ["Logistics Manager", "Production Manager", "Supply Chain Manager"],
+        "PMO": ["Project Coordinator", "Program Manager", "Portfolio Analyst"],
+        "Public Relations": ["Media Relations Specialist", "Communications Manager", "Brand Strategist"],
+        "Python Developer": ["Backend Engineer", "Django Developer", "AI Engineer"],
+        "React Developer": ["Frontend Developer", "Fullstack Developer", "UI Engineer"],
+        "SAP Developer": ["SAP ABAP Consultant", "SAP Functional Consultant", "ERP Specialist"],
+        "SQL Developer": ["Database Engineer", "ETL Developer", "BI Specialist"],
+        "Sales": ["Sales Executive", "Account Manager", "Business Development Manager"],
+        "Testing": ["QA Engineer", "Automation Tester", "SDET"],
+        "Web Designing": ["UI Designer", "Frontend Developer", "Visual Designer"],
     }
     return recommendations.get(predicted_label, ["No recommendations available"])
+
 
 # ================== Streamlit UI ==================
 st.title("📄 Smart Resume Classifier")
@@ -106,19 +146,27 @@ if option == "Upload PDF":
             texts_to_classify.append((uploaded_file.name, text))
 
 elif option == "Enter Text":
-    user_text = st.text_area("Paste your resume text here:")
+    user_text = st.text_area("Paste your resume text here:", key="resume_input")
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("Clear Text"):
+            st.session_state["resume_input"] = ""
+    with col2:
+        pass
     if user_text.strip():
         texts_to_classify.append(("Manual Input", user_text))
 
-# Run classification if we have text
-if texts_to_classify:
-    st.subheader("📌 Classified Resumes")
-    with st.container():
-        for name, text in texts_to_classify:
-            label, confidence = predict_resume(text)
-            st.markdown(f"**{name}** → 🏷️ {label} (Confidence: {confidence:.2f})")
+# Predict button
+if st.button("Predict"):
+    if texts_to_classify:
+        st.subheader("📌 Classified Resumes")
+        with st.container():
+            for name, text in texts_to_classify:
+                label, confidence = predict_resume(text)
+                st.markdown(f"**{name}** → 🏷️ {label} (Confidence: {confidence:.2f})")
 
-            # Show recommendations
-            recs = recommend_job_roles(label)
-            st.write("🔮 Recommended Roles:", ", ".join(recs))
-            st.divider()
+                # Show recommendations
+                recs = recommend_job_roles(label)
+                st.write("🔮 Recommended Roles:", ", ".join(recs))
+                st.divider()
+
