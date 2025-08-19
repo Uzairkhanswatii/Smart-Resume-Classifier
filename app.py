@@ -146,15 +146,22 @@ if option == "Upload PDF":
             texts_to_classify.append((uploaded_file.name, text))
 
 elif option == "Enter Text":
+    # Define a clear function for session state
+    def clear_text():
+        st.session_state["resume_input"] = ""
+
+    # Text area bound to session_state
     user_text = st.text_area("Paste your resume text here:", key="resume_input")
+
+    # Action buttons
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("Clear Text"):
-            st.session_state.resume_input= ""
-            st.experimental_rerun()
+        st.button("Clear Text", on_click=clear_text)
     with col2:
-        pass
-    if user_text.strip():
+        predict_clicked = st.button("Predict")
+
+    # Only append text when Predict is clicked
+    if predict_clicked and user_text.strip():
         texts_to_classify.append(("Manual Input", user_text))
 
 # Predict button
