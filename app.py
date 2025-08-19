@@ -10,7 +10,7 @@ from huggingface_hub import hf_hub_download
 st.set_page_config(page_title="Smart Resume Classifier", page_icon="📄")
 
 MODEL_NAME = "uzairkhanswatii/Smart-Resume-Classifier"  # HF Hub model repo
-LABEL_ENCODER_URL = "https://raw.githubusercontent.com/uzairkhanswatii/Smart-Resume-Classifier/main/label_encoder.pkl"
+LABEL_ENCODER_URL = "https://raw.githubusercontent.com/uzairkhanswatii/Smart-Resume-Classifier/main/label_encoder.pkl2"
 
 @st.cache_resource
 def load_model():
@@ -23,7 +23,7 @@ def load_model():
     model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
 
     # Load label encoder from GitHub
-    LABEL_ENCODER_URL = "https://raw.githubusercontent.com/uzairkhanswatii/Smart-Resume-Classifier/main/label_encoder1.pkl"
+    LABEL_ENCODER_URL = "https://raw.githubusercontent.com/uzairkhanswatii/Smart-Resume-Classifier/main/label_encoder1.pkl2"
     response = requests.get(LABEL_ENCODER_URL)
     response.raise_for_status()
     label_encoder = pickle.loads(response.content)
