@@ -299,6 +299,6 @@ Built by **Uzair Khan — ML Engineer**
 st.markdown("<hr>", unsafe_allow_html=True)
 st.markdown(
     "<center>Built by Uzair Khan — ML Engineer | 🔗 "
-    "<a href='https://github.com/yourgithub'>GitHub</a></center>",
+    "<a href='https://github.com/Uzairkhanswatii'>GitHub</a></center>",
     unsafe_allow_html=True,
 )
